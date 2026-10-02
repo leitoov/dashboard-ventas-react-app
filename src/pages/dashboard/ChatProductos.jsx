@@ -3,7 +3,15 @@ import ChatInterface from '../../components/ChatInterface';
 import { api } from '../../services/api';
 
 const ChatProductos = () => {
-  const [sessionId, setSessionId] = useState(null);
+  const [sessionId, setSessionId] = useState(() => {
+    return localStorage.getItem('chat_productos_session_id') || null;
+  });
+
+  React.useEffect(() => {
+    if (sessionId) {
+      localStorage.setItem('chat_productos_session_id', sessionId);
+    }
+  }, [sessionId]);
 
   const handleSendMessage = async (instruction, file) => {
     const response = await api.productAgent(instruction, file, sessionId);
@@ -32,6 +40,7 @@ const ChatProductos = () => {
           description="Escribe tus instrucciones: 'Crea un producto llamado Silla de Madera a $50'"
           accentColor="primaryBrown"
           onSendMessage={handleSendMessage}
+          storageKey="productos"
         />
       </div>
     </div>

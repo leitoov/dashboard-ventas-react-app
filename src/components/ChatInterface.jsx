@@ -1,10 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, X, FileText, Loader2, Bot, User } from 'lucide-react';
 
-const ChatInterface = ({ title, description, accentColor = 'primaryGreen', onSendMessage, initialMessage }) => {
-  const [messages, setMessages] = useState([
-    { id: 1, sender: 'bot', text: initialMessage || `¡Hola! Bienvenido a ${title}. ¿En qué te puedo ayudar hoy?`, file: null }
-  ]);
+const ChatInterface = ({ title, description, accentColor = 'primaryGreen', onSendMessage, initialMessage, storageKey }) => {
+  const loadInitialMessages = () => {
+    if (storageKey) {
+      const saved = localStorage.getItem(`chat_messages_${storageKey}`);
+      if (saved) return JSON.parse(saved);
+    }
+    return [{ id: 1, sender: 'bot', text: initialMessage || `¡Hola! Bienvenido a ${title}. ¿En qué te puedo ayudar hoy?`, file: null }];
+  };
+
+  const [messages, setMessages] = useState(loadInitialMessages);
   const [inputMessage, setInputMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +26,12 @@ const ChatInterface = ({ title, description, accentColor = 'primaryGreen', onSen
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (storageKey) {
+      localStorage.setItem(`chat_messages_${storageKey}`, JSON.stringify(messages));
+    }
+  }, [messages, storageKey]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

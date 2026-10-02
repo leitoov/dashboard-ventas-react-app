@@ -3,7 +3,13 @@ import ChatInterface from '../../components/ChatInterface';
 import { api } from '../../services/api';
 
 const ChatGeneral = () => {
-  const [sessionId, setSessionId] = useState(`chat-${Date.now()}`);
+  const [sessionId, setSessionId] = useState(() => {
+    return localStorage.getItem('chat_general_session_id') || `chat-${Date.now()}`;
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('chat_general_session_id', sessionId);
+  }, [sessionId]);
 
   const handleSendMessage = async (instruction, file) => {
     // Nota: El backend de ventas (salesAgent) actualmente recibe sessionId e instruction por JSON.
@@ -38,6 +44,7 @@ const ChatGeneral = () => {
           description="Escribe: 'Quiero cotizar 2 Zapatillas Nike'"
           accentColor="primaryGreen"
           onSendMessage={handleSendMessage}
+          storageKey="general"
         />
       </div>
     </div>
